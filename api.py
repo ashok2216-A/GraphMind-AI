@@ -45,11 +45,11 @@ class MemoryRequest(BaseModel):
     session_key: str = Field(min_length=1, max_length=100)
     keyword: str = Field(default="", max_length=160)
 
-@app.get("/")
+@app.api_route("/", methods=["GET", "HEAD"])
 def home():
     return {"name": "GraphMind", "status": "running", "docs": "/docs"}
 
-@app.get("/health")
+@app.api_route("/health", methods=["GET", "HEAD"])
 def health():
     try:
         from graphmind.db import query_rows
