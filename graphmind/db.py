@@ -5,15 +5,19 @@ from falkordb import FalkorDB
 load_dotenv()
 
 def get_graph():
-    url = os.getenv("FALKORDB_URL")
+    raw_url = os.getenv("FALKORDB_URL")
+    url = raw_url.strip().strip('"').strip("'") if raw_url else None
     if url:
         db = FalkorDB.from_url(url)
     else:
-        host = os.getenv("FALKORDB_HOST", "localhost")
+        raw_host = os.getenv("FALKORDB_HOST", "localhost")
+        host = raw_host.strip().strip('"').strip("'") if raw_host else "localhost"
         port = int(os.getenv("FALKORDB_PORT", "6379"))
         kwargs = {}
-        username = os.getenv("FALKORDB_USERNAME")
-        password = os.getenv("FALKORDB_PASSWORD")
+        raw_user = os.getenv("FALKORDB_USERNAME")
+        raw_pass = os.getenv("FALKORDB_PASSWORD")
+        username = raw_user.strip().strip('"').strip("'") if raw_user else None
+        password = raw_pass.strip().strip('"').strip("'") if raw_pass else None
         ssl_val = os.getenv("FALKORDB_SSL", "false").lower() in ("true", "1", "yes")
 
         if username:
@@ -25,7 +29,8 @@ def get_graph():
 
         db = FalkorDB(host=host, port=port, **kwargs)
 
-    return db.select_graph(os.getenv("FALKORDB_GRAPH", "graphmind"))
+    graph_name = os.getenv("FALKORDB_GRAPH", "graphmind").strip().strip('"').strip("'")
+    return db.select_graph(graph_name)
 
 def query_rows(query: str, params: dict | None = None) -> list[dict]:
     """Execute a parameterized, read-only Cypher query and normalize rows."""
