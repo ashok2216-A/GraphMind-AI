@@ -33,6 +33,8 @@
 
 </div>
 
+https://www.falkordb.com/wp-content/uploads/2024/06/Layer_1-4-1.png
+
 ## 📑 Table of Contents
 - [Executive Summary](#-executive-summary)
 - [How GraphMind Wins All Three Tracks](#-how-graphmind-wins-all-three-tracks)
