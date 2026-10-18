@@ -51,12 +51,13 @@ def home():
 
 @app.api_route("/health", methods=["GET", "HEAD"])
 def health():
+    db_status = "connected"
     try:
         from graphmind.db import query_rows
         query_rows("RETURN 1 AS ok")
-        return {"status": "ok", "database": "connected"}
     except Exception as exc:
-        raise HTTPException(status_code=503, detail=f"Database unavailable: {exc}")
+        db_status = f"waiting_or_unavailable: {exc}"
+    return {"status": "ok", "database": db_status}
 
 @app.post("/seed")
 def seed_endpoint():
