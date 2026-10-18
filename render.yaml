@@ -1,0 +1,62 @@
+services:
+  # ============================================================================
+  # GraphMind AI — Unified Web Service (Streamlit UI + FastAPI Backend)
+  # Recommended: Runs both the backend API and frontend UI in 1 Render service
+  # ============================================================================
+  - type: web
+    name: graphmind-app
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: bash start.sh
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: GOOGLE_API_KEY
+        sync: false
+      - key: GRAPHMIND_MODEL
+        value: gemini-2.5-flash
+      - key: FALKORDB_URL
+        sync: false
+      - key: FALKORDB_GRAPH
+        value: graphmind
+      - key: AUTO_SEED
+        value: "true"
+
+  # ============================================================================
+  # Alternative: Multi-Service Architecture (FastAPI + Streamlit separately)
+  # Uncomment below if you want separate endpoints/domains for API and UI
+  # ============================================================================
+  # - type: web
+  #   name: graphmind-api
+  #   runtime: python
+  #   plan: free
+  #   buildCommand: pip install -r requirements.txt
+  #   startCommand: uvicorn api:app --host 0.0.0.0 --port $PORT
+  #   healthCheckPath: /health
+  #   envVars:
+  #     - key: PYTHON_VERSION
+  #       value: 3.11.9
+  #     - key: GOOGLE_API_KEY
+  #       sync: false
+  #     - key: FALKORDB_URL
+  #       sync: false
+  #     - key: FALKORDB_GRAPH
+  #       value: graphmind
+  #     - key: AUTO_SEED
+  #       value: "true"
+  #
+  # - type: web
+  #   name: graphmind-ui
+  #   runtime: python
+  #   plan: free
+  #   buildCommand: pip install -r requirements.txt
+  #   startCommand: streamlit run streamlit_app.py --server.port $PORT --server.address 0.0.0.0
+  #   envVars:
+  #     - key: PYTHON_VERSION
+  #       value: 3.11.9
+  #     - key: API_BASE_URL
+  #       fromService:
+  #         type: web
+  #         name: graphmind-api
+  #         property: host
