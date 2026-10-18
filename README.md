@@ -3,6 +3,12 @@
 # 🧠 GraphMind AI
 ### *The Graph-Native Company Brain & Autonomous Incident Intelligence Agent*
 
+<br/>
+
+![GraphMind AI Banner](assets/banner.jpg)
+
+<br/>
+
 **Built for [Graph Hacks 2026](https://www.wemakedevs.org/) — Organised by WeMakeDevs in collaboration with FalkorDB**
 
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue?logo=python&logoColor=white)](https://www.python.org/)
@@ -32,6 +38,10 @@
 ---
 
 </div>
+
+<p align="center">
+  <a href="https://www.falkordb.com/"><img src="https://www.falkordb.com/wp-content/uploads/2024/06/Layer_1-4-1.png" alt="FalkorDB Graph Engine" width="100%" /></a>
+</p>
 
 ## 📑 Table of Contents
 - [Executive Summary](#-executive-summary)
@@ -119,8 +129,8 @@ flowchart TD
     ADK_WEB -->|Interactive Agent Loop| AGENT
     AGENT -->|Function Calling| TOOLS
     API -->|Direct Call| TOOLS
-    TOOLS -->|Parameterized Read Cypher (ro_query)| FALKOR
-    TOOLS -->|Parameterized Scoped Write (query)| FALKOR
+    TOOLS -->|Read-Only Cypher| FALKOR
+    TOOLS -->|Scoped Writes| FALKOR
     FALKOR --- NODES
     FALKOR --- EDGES
 ```
