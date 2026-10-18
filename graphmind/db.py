@@ -2,13 +2,20 @@ import os
 from dotenv import load_dotenv
 from falkordb import FalkorDB
 
+from redis import ConnectionPool
+
 load_dotenv()
 
 def get_graph():
     raw_url = os.getenv("FALKORDB_URL")
     url = raw_url.strip().strip('"').strip("'") if raw_url else None
     if url:
-        db = FalkorDB.from_url(url)
+        pool = ConnectionPool.from_url(
+            url,
+            socket_timeout=5.0,
+            socket_connect_timeout=5.0,
+        )
+        db = FalkorDB(connection_pool=pool)
     else:
         raw_host = os.getenv("FALKORDB_HOST", "localhost")
         host = raw_host.strip().strip('"').strip("'") if raw_host else "localhost"
@@ -27,7 +34,13 @@ def get_graph():
         if ssl_val:
             kwargs["ssl"] = True
 
-        db = FalkorDB(host=host, port=port, **kwargs)
+        db = FalkorDB(
+            host=host,
+            port=port,
+            socket_timeout=5.0,
+            socket_connect_timeout=5.0,
+            **kwargs,
+        )
 
     graph_name = os.getenv("FALKORDB_GRAPH", "graphmind").strip().strip('"').strip("'")
     return db.select_graph(graph_name)
