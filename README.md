@@ -98,19 +98,19 @@ GraphMind combines an ultra-fast graph engine, an autonomous AI agent, a typed R
 
 ```mermaid
 flowchart TD
-    subgraph Clients ["Client Layer"]
+    subgraph Clients["Client Layer"]
         ST["Streamlit Web App<br/>(Visual Investigation & Topology UI)"]
         ADK_WEB["Google ADK Web UI<br/>(Interactive AI Agent Chat)"]
     end
 
-    subgraph ServiceLayer ["Application & Backend Layer"]
+    subgraph ServiceLayer["Application & Backend Layer"]
         API["FastAPI REST Engine (api.py)<br/>• /search  • /dependencies<br/>• /incident • /memory/recall • /graph"]
         AGENT["Google ADK Agent (agent.py)<br/>• Gemini 2.5 Flash<br/>• System Guardrails & Prompt Policies"]
         TOOLS["Safe Parameterized Tools (tools.py)<br/>• Zero Raw Cypher Injection<br/>• Length Limits & Input Sanitization"]
     end
 
-    subgraph GraphLayer ["Graph Database Layer (FalkorDB)"]
-        FALKOR[("FalkorDB Engine<br/>GraphBLAS Matrix Operations")]
+    subgraph GraphLayer["Graph Database Layer (FalkorDB)"]
+        FALKOR(("FalkorDB Engine<br/>GraphBLAS Matrix Operations"))
         NODES["Nodes: Company, Team, Person, Service,<br/>Incident, Project, Decision, Document, AgentMemory"]
         EDGES["Edges: HAS_TEAM, MEMBER_OF, DEPENDS_ON,<br/>OWNED_BY, AFFECTS, DOCUMENTED_BY, USES,<br/>GOVERNS, RELEVANT_TO, DESCRIBES, ABOUT"]
     end
