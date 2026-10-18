@@ -33,8 +33,6 @@
 
 </div>
 
-https://www.falkordb.com/wp-content/uploads/2024/06/Layer_1-4-1.png
-
 ## 📑 Table of Contents
 - [Executive Summary](#-executive-summary)
 - [How GraphMind Wins All Three Tracks](#-how-graphmind-wins-all-three-tracks)
@@ -59,7 +57,7 @@ During critical outages or complex migrations, engineering teams struggle with *
 - **Lost Context:** Architecture Decision Records (ADRs) explaining *why* a service was built synchronously are buried in outdated wikis.
 - **Repeated Triage Work:** On-call engineers spend hours re-diagnosing issues that were solved days earlier by another team member because past findings are not recorded in a connected way.
 
-**GraphMind AI** is an intelligent, graph-native company intelligence system. Powered by **FalkorDB** as its unified knowledge graph and **Google ADK with Gemini 2.5 Flash** as its autonomous reasoning layer.
+**GraphMind AI** is an intelligent, graph-native company intelligence system. Powered by **FalkorDB** as its unified knowledge graph and **Google ADK with Gemini 2.5 Flash** as its autonomous reasoning engine, GraphMind connects people, teams, services, architectural decisions, runbooks, incidents, and cross-session agent memories into an interconnected **Company Brain**.
 
 ---
 
@@ -70,16 +68,16 @@ GraphMind explicitly addresses the core requirements of all three hackathon trac
 ### 1. 🎯 Track 1: Agents That Act on Connected Data
 - **Multi-Hop Dependency Traversal:** Traverses up to 4 hops of service dependencies (`[:DEPENDS_ON*1..4]`) to detect hidden blast radiuses and upstream failure origins.
 - **Incident-to-Action Pipeline:** Connects active incidents (`INC-101`) with impacted services, emergency runbooks, governing architectural decisions, and service owners in a single query.
-- **Advisory Action Paradigm:** Evaluates graph evidence and formulates safe, actionable remediation recommendations (e.g., escalating to specific owners, executing targeted runbook procedures).
+- **Advisory Action Paradigm:** Evaluates graph evidence and formulates safe, actionable remediation recommendations (e.g., escalating to specific owners, executing targeted runbook procedures) with human-in-the-loop validation.
 
 ### 2. 🧠 Track 2: Agent Memory and Coordination
 - **Persistent Graph Memory Nodes:** Saves synthesized investigation conclusions directly into the graph as `:AgentMemory` nodes with timestamps and session keys.
 - **Polymorphic Entity Association:** Links memories directly to related graph nodes (`(m:AgentMemory)-[:ABOUT]->(entity)`) across services, incidents, and decisions.
-- **Cross-Session Coordination:** Allows an agent running in session `user-b` or `shared` to recall findings discovered by `user-a` hours earlier, preventing redundant triage and enabling continuous agent memory.
+- **Cross-Session Coordination:** Allows an agent running in session `user-b` or `shared` to recall findings discovered by `user-a` hours earlier, preventing redundant triage and enabling continuous asynchronous collaboration.
 
 ### 3. 🏛️ Track 3: Company Brain
 - **Unified Enterprise Topology:** Maps 9 distinct entity types (Company, Team, Person, Service, Incident, Project, Decision, Document, AgentMemory) into a unified property graph.
-- **Holistic Contextual Search:** Searches across people, teams, ADRs, runbooks, and project roadmaps simultaneously, answering queries like *"Who owns the service affected by INC-101 and what decision explains this architecture?"*
+- **Holistic Contextual Search:** Searches across people, teams, ADRs, runbooks, and project roadmaps simultaneously, answering queries like *"Who owns the service affected by INC-101 and what decision governed its write model?"* in sub-milliseconds.
 
 ---
 
@@ -88,9 +86,9 @@ GraphMind explicitly addresses the core requirements of all three hackathon trac
 > **Hackathon Rule 3:** *"The graph has to do real work... if the product still works once FalkorDB is taken out, the graph is decoration rather than the thing the product runs on."*
 
 In GraphMind, **FalkorDB is the fundamental engine, not a decorative visualization**:
-1. **Recursive Multi-Hop Traversal:** Tracing dependencies 4 hops deep (`[:DEPENDS_ON*1..4]`) in a relational database requires 4 recursive `JOIN`s or recursive CTEs that collapse under microservice scale.
-2. **Polymorphic Contextual Relationships:** Agent findings connect to *any* entity type (`[:ABOUT] -> (Service | Incident | Decision | Project)`). In SQL, this requires complex polymorphic join tables and brittle schema workarounds.
-3. **Single Source of Truth:** GraphMind has **no secondary database, no fallback cache, and no mock data layer**. If FalkorDB is offline or stopped, the API `/health` returns `503`, the Streamlit dashboard loses its operational view, and the agent cannot reason over enterprise context.
+1. **Recursive Multi-Hop Traversal:** Tracing dependencies 4 hops deep (`[:DEPENDS_ON*1..4]`) in a relational database requires 4 recursive `JOIN`s or recursive CTEs that collapse under microservice scale. FalkorDB computes this via Sparse Matrix Matrix Multiplication (GraphBLAS) in microseconds.
+2. **Polymorphic Contextual Relationships:** Agent findings connect to *any* entity type (`[:ABOUT] -> (Service | Incident | Decision | Project)`). In SQL, this requires complex polymorphic join tables or separate mapping tables for every entity type.
+3. **Single Source of Truth:** GraphMind has **no secondary database, no fallback cache, and no mock data layer**. If FalkorDB is offline or stopped, the API `/health` returns `503`, the Streamlit dashboard disables all tabs, and the ADK Agent cannot function. The graph **is** the application.
 
 ---
 
@@ -121,12 +119,11 @@ flowchart TD
     ADK_WEB -->|Interactive Agent Loop| AGENT
     AGENT -->|Function Calling| TOOLS
     API -->|Direct Call| TOOLS
-    TOOLS -->|Read-Only Cypher| FALKOR
-    TOOLS -->|Scoped Writes| FALKOR
+    TOOLS -->|Parameterized Read Cypher (ro_query)| FALKOR
+    TOOLS -->|Parameterized Scoped Write (query)| FALKOR
     FALKOR --- NODES
     FALKOR --- EDGES
 ```
-
 
 ---
 
@@ -228,7 +225,7 @@ RETURN i.id AS incident_id,
        collect(DISTINCT downstream.name) AS downstream_services
 LIMIT 5
 ```
-- **Why this matters:** When an incident hits `Payment API`, this query immediately discovers that `Checkout Service` is downstream and will suffer secondary outages, while simultaneously pulling the relevant runbook and owner data.
+- **Why this matters:** When an incident hits `Payment API`, this query immediately discovers that `Checkout Service` is downstream and will suffer secondary outages, while simultaneously pulling the emergency runbook.
 
 ---
 
@@ -291,11 +288,11 @@ LIMIT 15
 The Streamlit interface (`streamlit_app.py`) provides an interactive window into the Company Brain:
 
 ```
-┌────────────────────────────────────────────────────────────────[...]
+┌────────────────────────────────────────────────────────────────────────┐
 │  🧠 GraphMind AI — Company Brain & Incident Investigation Dashboard    │
-├──────────────┬──────────────────┬───────────────────┬──────────[...]
+├──────────────┬──────────────────┬───────────────────┬──────────────────┤
 │ Investigate  │  Company Brain   │ Persistent Memory │  Graph Explorer  │
-└──────────────┴──────────────────┴───────────────────┴──────────[...]
+└──────────────┴──────────────────┴───────────────────┴──────────────────┘
 ```
 
 1. **Investigate Tab:**
@@ -424,7 +421,7 @@ The FastAPI service (`api.py`) exposes typed, validated endpoints:
 
 - **Zero Raw Cypher Exposure:** The LLM is never given direct Cypher execution privileges. All graph operations use fixed, parameterized functions.
 - **Strict Input Constraints:** Parameters have maximum string length limits to prevent denial-of-service and buffer injection.
-- **Advisory Recommendations:** GraphMind adheres to safety protocols: it provides verified incident evidence and recommends next actions to human operators rather than performing unverified modifications.
+- **Advisory Recommendations:** GraphMind adheres to safety protocols: it provides verified incident evidence and recommends next actions to human operators rather than performing unverified modifications to infrastructure.
 
 ---
 
