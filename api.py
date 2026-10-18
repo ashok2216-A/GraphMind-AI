@@ -72,20 +72,35 @@ def seed_endpoint():
 
 @app.post("/search")
 def search(req: SearchRequest):
-    return search_company_knowledge(req.keyword)
+    try:
+        return search_company_knowledge(req.keyword)
+    except Exception as exc:
+        raise HTTPException(status_code=503, detail=f"Database error: {exc}")
 
 @app.post("/dependencies")
 def dependencies(req: ServiceRequest):
-    return trace_service_dependencies(req.service_name)
+    try:
+        return trace_service_dependencies(req.service_name)
+    except Exception as exc:
+        raise HTTPException(status_code=503, detail=f"Database error: {exc}")
 
 @app.post("/incident")
 def incident(req: IncidentRequest):
-    return get_incident_evidence(req.incident_id)
+    try:
+        return get_incident_evidence(req.incident_id)
+    except Exception as exc:
+        raise HTTPException(status_code=503, detail=f"Database error: {exc}")
 
 @app.post("/memory/recall")
 def memory(req: MemoryRequest):
-    return recall_memory(req.session_key, req.keyword)
+    try:
+        return recall_memory(req.session_key, req.keyword)
+    except Exception as exc:
+        raise HTTPException(status_code=503, detail=f"Database error: {exc}")
 
 @app.get("/graph")
 def graph():
-    return get_graph_snapshot()
+    try:
+        return get_graph_snapshot()
+    except Exception as exc:
+        raise HTTPException(status_code=503, detail=f"Database error: {exc}")
