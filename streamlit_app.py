@@ -21,6 +21,7 @@ else:
 
 def call_api(method: str, path: str, data: dict = None):
     """Query FastAPI endpoint if reachable; seamlessly fallback to direct tools."""
+    print(f"[Render Live Log] {method} {path} - data: {data}", flush=True)
     if API:
         try:
             if method.upper() == "POST":
@@ -28,9 +29,10 @@ def call_api(method: str, path: str, data: dict = None):
             else:
                 r = requests.get(f"{API}{path}", timeout=4)
             if r.status_code == 200:
+                print(f"[Render Live Log] HTTP {r.status_code} from backend API for {path}", flush=True)
                 return r.json()
-        except Exception:
-            pass  # Fall back to in-process execution
+        except Exception as exc:
+            print(f"[Render Live Log] HTTP API notice ({exc}). Running graph tool in-process.", flush=True)
 
     # In-process execution fallback
     if path == "/seed":
