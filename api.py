@@ -22,15 +22,19 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+import threading
+
 @app.on_event("startup")
 def startup_event():
     if os.getenv("AUTO_SEED", "false").lower() in ("true", "1", "yes"):
-        try:
-            print("AUTO_SEED enabled: seeding demo graph...")
-            seed()
-            print("Graph seeded successfully.")
-        except Exception as exc:
-            print(f"AUTO_SEED notice: seeding failed or database not ready: {exc}")
+        def background_seed():
+            try:
+                print("AUTO_SEED enabled: seeding demo graph in background...", flush=True)
+                seed()
+                print("Graph seeded successfully.", flush=True)
+            except Exception as exc:
+                print(f"AUTO_SEED notice: database not ready or seeding failed ({exc}). Seeding can be triggered anytime via UI or POST /seed.", flush=True)
+        threading.Thread(target=background_seed, daemon=True).start()
 
 class SearchRequest(BaseModel):
     keyword: str = Field(min_length=1, max_length=160)
